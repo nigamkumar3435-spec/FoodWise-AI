@@ -121,10 +121,22 @@
 <script>
 function toggleRoleFields() {
   const role = document.getElementById('roleSelect').value;
-  document.getElementById('providerFields').classList.toggle('d-none', role !== 'provider');
-  document.getElementById('ngoFields').classList.toggle('d-none', role !== 'ngo');
+  const isProvider = role === 'provider';
+
+  document.getElementById('providerFields').classList.toggle('d-none', !isProvider);
+  document.getElementById('ngoFields').classList.toggle('d-none', isProvider);
+
+  // Disable inputs in the hidden section so they are NOT submitted with the form
+  document.querySelectorAll('#providerFields input, #providerFields select').forEach(function(el) {
+    el.disabled = isProvider ? false : true;
+  });
+  document.querySelectorAll('#ngoFields input, #ngoFields select').forEach(function(el) {
+    el.disabled = isProvider ? true : false;
+  });
 }
-// Init
-toggleRoleFields();
+// Run on page load
+document.addEventListener('DOMContentLoaded', function() {
+  toggleRoleFields();
+});
 </script>
 {% endblock %}
