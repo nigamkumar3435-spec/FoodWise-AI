@@ -47,7 +47,7 @@ FoodWise *contributes to* and *supports* these goals. It does not claim to solve
 | Layer | Technology |
 |-------|-----------|
 | Frontend | HTML5, CSS3, Bootstrap 5, Chart.js, Font Awesome |
-| Backend | Python 3, Flask, Flask-SQLAlchemy, Flask-Login |
+| Backend | Python 3, Flask, Flask-SQLAlchemy, Flask-Login, Gunicorn (prod) |
 | Database | SQLite (dev) — swap to PostgreSQL/MySQL via `DATABASE_URL` |
 | ML | scikit-learn (GradientBoosting, RandomForest, LinearRegression), joblib, pandas, numpy |
 | Auth | Werkzeug password hashing, Flask-Login sessions, CSRF protection |
@@ -174,8 +174,11 @@ flask seed-demo
 # 8. Train ML model
 python ml/train_model.py
 
-# 9. Run the application
-python app.py
+# 9. Run the application (development)
+python run.py
+
+# 9b. Run with Gunicorn (production)
+gunicorn -w 4 -b 0.0.0.0:5000 "app:create_app()"
 ```
 
 Then open: **http://127.0.0.1:5000**
@@ -201,7 +204,7 @@ WATSONX_PROJECT_ID=...
 
 # Admin seed credentials
 ADMIN_EMAIL=admin@foodwise.ai
-ADMIN_PASSWORD=Admin@FoodWise123
+ADMIN_PASSWORD=Admin@123
 ```
 
 **Never commit `.env` to version control.**
@@ -268,7 +271,7 @@ After running `flask seed-demo`:
 |------|-------|----------|
 | Food Provider | demo.canteen@foodwise.ai | Demo@1234 |
 | NGO | demo.ngo@foodwise.ai | Demo@1234 |
-| Admin | admin@foodwise.ai | Admin@FoodWise123 |
+| Admin | admin@foodwise.ai | Admin@123 |
 
 ---
 
@@ -330,3 +333,15 @@ FoodWise AI does not guarantee the safety of any surplus food listed on the plat
 ---
 
 *FoodWise AI — supporting SDG 2 and SDG 12 through intelligent food management.*
+
+## Changelog
+
+### v1.1.0
+- **Fix:** NGO registration — disabled hidden provider section inputs on form submit to prevent empty `organization_name` collision
+- **Fix:** NGO registration — renamed NGO org-name field to `ngo_organization_name` to avoid duplicate field name conflict with provider section
+- **Added:** `gunicorn` to `requirements.txt` for production WSGI deployment
+- **Updated:** Default admin password in `.env.example` changed to `Admin@123`
+- **Updated:** Startup script `run.py` added for clean server launch
+
+### v1.0.0
+- Initial release: full FoodWise AI platform with ML pipeline, provider/NGO/admin dashboards, AI assistant, NGO matching, and impact metrics
