@@ -22,7 +22,11 @@ def register():
         password = request.form.get('password', '')
         confirm_password = request.form.get('confirm_password', '')
         role = request.form.get('role', 'provider')
-        org_name = request.form.get('organization_name', '').strip()
+        # NGO uses a separate field name to avoid collision with the provider field
+        if role == 'ngo':
+            org_name = request.form.get('ngo_organization_name', '').strip()
+        else:
+            org_name = request.form.get('organization_name', '').strip()
         org_type = request.form.get('organization_type', '').strip()
         city = request.form.get('city', '').strip()
         capacity = request.form.get('capacity', 0)
