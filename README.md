@@ -271,7 +271,7 @@ After running `flask seed-demo`:
 |------|-------|----------|
 | Food Provider | demo.canteen@foodwise.ai | Demo@1234 |
 | NGO | demo.ngo@foodwise.ai | Demo@1234 |
-| Admin | admin@foodwise.ai | Admin@123 |
+| Admin | admin@foodwise.ai | Admin@FoodWise123 |
 
 ---
 
