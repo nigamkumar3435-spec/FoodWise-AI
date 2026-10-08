@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Surplus Listings — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-0"><i class="fas fa-box-open text-success me-2"></i>Surplus Listings</h4>
+      <p class="text-muted small mb-0">{{ org.organization_name }}</p>
+    </div>
+    <a href="{{ url_for('provider.create_surplus') }}" class="btn btn-success">
+      <i class="fas fa-plus me-1"></i>Create Listing
+    </a>
+  </div>
+
+  {% if listings %}
+  <div class="row g-3">
+    {% for l in listings %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="fw-semibold mb-0">{{ l.food_name }}</h6>
+            <span class="badge status-{{ l.status }}">{{ l.status | title }}</span>
+          </div>
+          <p class="text-muted small mb-1">
+            <i class="fas fa-tag me-1"></i>{{ l.food_category | title }}
+          </p>
+          <p class="text-muted small mb-1">
+            <i class="fas fa-weight-hanging me-1"></i>{{ l.quantity | int }} {{ l.unit }}
+          </p>
+          {% if l.pickup_deadline %}
+          <p class="text-muted small mb-1">
+            <i class="fas fa-clock me-1"></i>Pickup by: {{ l.pickup_deadline.strftime('%d %b %H:%M') }}
+          </p>
+          {% endif %}
+          <p class="text-muted x-small mb-0">
+            Listed {{ l.created_at.strftime('%d %b %Y') }}
+          </p>
+        </div>
+        <div class="card-footer bg-white border-0 pt-0">
+          <div class="d-flex gap-2">
+            {% if l.status == 'available' %}
+            <a href="{{ url_for('provider.matches', listing_id=l.id) }}" class="btn btn-outline-success btn-sm flex-grow-1">
+              <i class="fas fa-search me-1"></i>Find NGOs
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="fas fa-box-open fa-3x text-muted mb-3 d-block opacity-25"></i>
+    <h5 class="text-muted">No surplus listings yet</h5>
+    <p class="text-muted small">Create a listing when you have surplus food to redistribute.</p>
+    <a href="{{ url_for('provider.create_surplus') }}" class="btn btn-success">
+      <i class="fas fa-plus me-1"></i>Create First Listing
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

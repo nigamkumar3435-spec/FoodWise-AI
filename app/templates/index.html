@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% block title %}FoodWise AI — Predict Demand. Reduce Waste. Feed More.{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero-section">
+  <div class="container text-center py-5">
+    <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill mb-3 small fw-semibold">
+      <i class="fas fa-leaf me-1"></i>AI-Powered Food Management
+    </span>
+    <h1 class="display-4 fw-bold mb-3">FoodWise <span class="text-success">AI</span></h1>
+    <p class="lead text-muted mb-2">Predict Demand. Reduce Waste. Feed More.</p>
+    <p class="text-muted mx-auto mb-4" style="max-width:600px">
+      AI-powered food demand forecasting and surplus redistribution for smarter,
+      more sustainable food management in restaurants, canteens, hotels, and catering services.
+    </p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg px-4">
+        <i class="fas fa-rocket me-2"></i>Start Reducing Waste
+      </a>
+      <a href="#how-it-works" class="btn btn-outline-secondary btn-lg px-4">
+        Explore Platform
+      </a>
+    </div>
+    <p class="text-muted small mt-4">
+      <em>"Predict demand before cooking. Redirect surplus before it becomes waste."</em>
+    </p>
+  </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="bg-success text-white py-4">
+  <div class="container">
+    <div class="row text-center g-3">
+      <div class="col-6 col-md-3">
+        <h3 class="fw-bold mb-0">~30%</h3>
+        <small>Average Food Waste Reduction</small>
+      </div>
+      <div class="col-6 col-md-3">
+        <h3 class="fw-bold mb-0">ML</h3>
+        <small>Real Machine Learning Models</small>
+      </div>
+      <div class="col-6 col-md-3">
+        <h3 class="fw-bold mb-0">SDG 2 &amp; 12</h3>
+        <small>UN Sustainable Development Goals</small>
+      </div>
+      <div class="col-6 col-md-3">
+        <h3 class="fw-bold mb-0">Open</h3>
+        <small>Free for NGOs &amp; Food Banks</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Problem Section -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">The Problem</h2>
+      <p class="text-muted">Food-serving organizations over-prepare because they rely on manual estimates.</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm text-center p-4">
+          <div class="display-4 mb-3">🍲</div>
+          <h5 class="fw-semibold">Overproduction</h5>
+          <p class="text-muted small">Institutions prepare 15–30% more food than actual demand, leading to significant daily surplus.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm text-center p-4">
+          <div class="display-4 mb-3">🗑️</div>
+          <h5 class="fw-semibold">Food Waste</h5>
+          <p class="text-muted small">Edible food ends up discarded while millions face food insecurity — a preventable tragedy.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm text-center p-4">
+          <div class="display-4 mb-3">🔗</div>
+          <h5 class="fw-semibold">Inefficient Redistribution</h5>
+          <p class="text-muted small">No intelligent platform connects surplus providers with nearby NGOs and food banks efficiently.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Solution Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Our Solution</h2>
+      <p class="text-muted">Four intelligent modules working together.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm p-4">
+          <div class="text-success mb-3"><i class="fas fa-brain fa-2x"></i></div>
+          <h5 class="fw-semibold">AI Demand Prediction</h5>
+          <p class="text-muted small">Machine Learning model trained on your historical food data predicts exactly how much to prepare.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm p-4">
+          <div class="text-success mb-3"><i class="fas fa-search fa-2x"></i></div>
+          <h5 class="fw-semibold">Smart Surplus Detection</h5>
+          <p class="text-muted small">Automatically detects surplus food and flags it for redistribution before it goes to waste.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm p-4">
+          <div class="text-success mb-3"><i class="fas fa-map-marker-alt fa-2x"></i></div>
+          <h5 class="fw-semibold">Food Redistribution</h5>
+          <p class="text-muted small">Intelligent geo-matching connects surplus food with the nearest suitable NGOs and food banks.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm p-4">
+          <div class="text-success mb-3"><i class="fas fa-robot fa-2x"></i></div>
+          <h5 class="fw-semibold">AI Assistant</h5>
+          <p class="text-muted small">Data-driven chatbot explains predictions, identifies waste patterns, and suggests improvements.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5 bg-light" id="how-it-works">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">How It Works</h2>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="flow-steps">
+          {% set steps = [
+            ('fas fa-database', 'Historical Data', 'Your past food consumption patterns'),
+            ('fas fa-brain', 'ML Prediction', 'Model forecasts tomorrow\'s demand'),
+            ('fas fa-utensils', 'Prepare Smarter', 'Cook only what\'s needed'),
+            ('fas fa-search', 'Detect Surplus', 'System flags leftover food'),
+            ('fas fa-handshake', 'Match NGO', 'Algorithm finds best-fit partners'),
+            ('fas fa-truck', 'Redistribute Food', 'Edible surplus reaches those in need'),
+            ('fas fa-chart-line', 'Measure Impact', 'Track waste reduction &amp; meals saved'),
+          ] %}
+          {% for icon, title, desc in steps %}
+          <div class="d-flex align-items-start mb-3">
+            <div class="flow-step-icon bg-success text-white rounded-circle me-3 flex-shrink-0">
+              <i class="{{ icon }}"></i>
+            </div>
+            <div>
+              <h6 class="fw-semibold mb-0">{{ title }}</h6>
+              <p class="text-muted small mb-0">{{ desc }}</p>
+            </div>
+          </div>
+          {% if not loop.last %}
+          <div class="flow-connector ms-3 mb-1"></div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SDG Section -->
+<section class="py-5" id="sdg">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Aligned with UN SDGs</h2>
+      <p class="text-muted">FoodWise AI supports global sustainable development goals.</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-5">
+        <div class="card border-0 shadow-sm p-4 h-100">
+          <div class="d-flex align-items-center mb-3">
+            <div class="sdg-badge bg-warning text-white rounded me-3 px-2 py-1 fw-bold">SDG 2</div>
+            <h5 class="fw-semibold mb-0">Zero Hunger</h5>
+          </div>
+          <p class="text-muted small mb-0">
+            FoodWise helps reduce preventable food waste and supports redistribution
+            of edible surplus to organizations working to address food insecurity.
+            The platform <em>contributes to</em>, but does not claim to solve, hunger alone.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="card border-0 shadow-sm p-4 h-100">
+          <div class="d-flex align-items-center mb-3">
+            <div class="sdg-badge bg-success text-white rounded me-3 px-2 py-1 fw-bold">SDG 12</div>
+            <h5 class="fw-semibold mb-0">Responsible Consumption</h5>
+          </div>
+          <p class="text-muted small mb-0">
+            By improving food planning through AI demand forecasting, FoodWise
+            helps institutions increase the utilization of prepared food and reduce
+            waste at the source.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5 bg-success text-white">
+  <div class="container text-center">
+    <h2 class="fw-bold mb-3">Ready to reduce food waste?</h2>
+    <p class="mb-4 opacity-75">Join FoodWise AI today. Free for NGOs and food banks.</p>
+    <a href="{{ url_for('auth.register') }}" class="btn btn-white btn-lg px-5 text-success fw-semibold">
+      Get Started — It's Free
+    </a>
+  </div>
+</section>
+{% endblock %}

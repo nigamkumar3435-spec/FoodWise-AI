@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% block title %}Provider Dashboard — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+  <!-- Page header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-0">{{ org.organization_name }}</h4>
+      <p class="text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>{{ org.city }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      {% if pending_requests > 0 %}
+      <a href="{{ url_for('provider.donations') }}" class="btn btn-warning btn-sm">
+        <i class="fas fa-bell me-1"></i>{{ pending_requests }} Pending Request{{ 's' if pending_requests != 1 }}
+      </a>
+      {% endif %}
+      <a href="{{ url_for('provider.predict') }}" class="btn btn-success btn-sm">
+        <i class="fas fa-brain me-1"></i>Get Prediction
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="kpi-card card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <div class="kpi-icon bg-success-subtle text-success rounded-circle me-2">
+              <i class="fas fa-brain"></i>
+            </div>
+            <span class="text-muted small">Today's Prediction</span>
+          </div>
+          {% if today_pred %}
+          <h3 class="fw-bold mb-0">{{ today_pred.predicted_demand | round | int }}</h3>
+          <p class="text-muted small mb-0">meals for {{ today_pred.meal_type }}</p>
+          {% else %}
+          <h3 class="fw-bold text-muted mb-0">—</h3>
+          <p class="text-muted small mb-0"><a href="{{ url_for('provider.predict') }}">Run prediction</a></p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="kpi-card card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <div class="kpi-icon bg-primary-subtle text-primary rounded-circle me-2">
+              <i class="fas fa-utensils"></i>
+            </div>
+            <span class="text-muted small">Prepared (30d)</span>
+          </div>
+          <h3 class="fw-bold mb-0">{{ total_prepared_month | int }}</h3>
+          <p class="text-muted small mb-0">total meals prepared</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="kpi-card card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <div class="kpi-icon bg-info-subtle text-info rounded-circle me-2">
+              <i class="fas fa-leaf"></i>
+            </div>
+            <span class="text-muted small">Food Saved</span>
+          </div>
+          <h3 class="fw-bold mb-0">{{ (impact.total_food_saved_kg if impact else 0) | round(1) }} kg</h3>
+          <p class="text-muted small mb-0">redistributed to NGOs</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="kpi-card card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <div class="kpi-icon {% if waste_pct > 20 %}bg-danger-subtle text-danger{% elif waste_pct > 10 %}bg-warning-subtle text-warning{% else %}bg-success-subtle text-success{% endif %} rounded-circle me-2">
+              <i class="fas fa-chart-pie"></i>
+            </div>
+            <span class="text-muted small">Waste Rate (30d)</span>
+          </div>
+          <h3 class="fw-bold mb-0">{{ waste_pct }}%</h3>
+          <p class="text-muted small mb-0">{{ 'High — reduce prep' if waste_pct > 20 else ('Monitor' if waste_pct > 10 else 'On track') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="row g-3 mb-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-3">Food Prepared vs Consumed (Last 30 Days)</h6>
+          <canvas id="prepConsumedChart" height="80"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-3">Weekly Surplus Trend</h6>
+          <canvas id="surplusChart" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent activity row -->
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pt-3 pb-0 d-flex justify-content-between">
+          <h6 class="fw-semibold mb-0">Recent Food History (7 days)</h6>
+          <a href="{{ url_for('provider.history') }}" class="btn btn-outline-secondary btn-sm">View All</a>
+        </div>
+        <div class="card-body p-0">
+          {% if history_7 %}
+          <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Date</th><th>Meal</th><th>Prepared</th><th>Consumed</th>
+                  <th>Surplus</th><th>Waste%</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for h in history_7 | sort(attribute='date', reverse=True) | list %}
+                <tr>
+                  <td class="text-muted small">{{ h.date.strftime('%d %b') }}</td>
+                  <td><span class="badge bg-light text-dark">{{ h.meal_type }}</span></td>
+                  <td>{{ h.food_prepared | int }}</td>
+                  <td>{{ h.food_consumed | int }}</td>
+                  <td class="{{ 'text-danger' if h.surplus_food > 50 else 'text-warning' if h.surplus_food > 20 else 'text-success' }}">
+                    {{ h.surplus_food | int }}
+                  </td>
+                  <td>
+                    <span class="badge {{ 'bg-danger' if h.waste_percentage > 20 else 'bg-warning text-dark' if h.waste_percentage > 10 else 'bg-success' }}">
+                      {{ h.waste_percentage }}%
+                    </span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-4 text-muted">
+            <i class="fas fa-database fa-2x mb-2 d-block"></i>
+            No history yet.
+            <a href="{{ url_for('provider.add_history') }}" class="btn btn-success btn-sm mt-2">Add First Record</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pt-3 pb-0 d-flex justify-content-between">
+          <h6 class="fw-semibold mb-0">Recent Surplus Listings</h6>
+          <a href="{{ url_for('provider.surplus') }}" class="btn btn-outline-secondary btn-sm">View All</a>
+        </div>
+        <div class="card-body">
+          {% if recent_listings %}
+            {% for l in recent_listings %}
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <div>
+                <p class="mb-0 fw-semibold small">{{ l.food_name }}</p>
+                <p class="mb-0 text-muted x-small">{{ l.quantity | int }} {{ l.unit }}</p>
+              </div>
+              <span class="badge status-{{ l.status }}">{{ l.status | title }}</span>
+            </div>
+            {% endfor %}
+          {% else %}
+          <div class="text-center py-3 text-muted">
+            <i class="fas fa-box-open fa-2x mb-2 d-block"></i>
+            <p class="small mb-2">No surplus listings yet.</p>
+            <a href="{{ url_for('provider.create_surplus') }}" class="btn btn-success btn-sm">Create Listing</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if impact %}
+      <div class="card border-0 shadow-sm mt-3 bg-success text-white">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-3"><i class="fas fa-star me-1"></i>Your Impact</h6>
+          <div class="row g-2 text-center">
+            <div class="col-6">
+              <h5 class="fw-bold mb-0">{{ impact.meals_saved | int }}</h5>
+              <small class="opacity-75">Meals Redistributed</small>
+            </div>
+            <div class="col-6">
+              <h5 class="fw-bold mb-0">{{ impact.successful_donations }}</h5>
+              <small class="opacity-75">Donations Completed</small>
+            </div>
+            <div class="col-6">
+              <h5 class="fw-bold mb-0">{{ impact.total_food_saved_kg | round(1) }} kg</h5>
+              <small class="opacity-75">Food Saved</small>
+            </div>
+            <div class="col-6">
+              <h5 class="fw-bold mb-0">₹{{ impact.money_saved | int | string | replace(',', '') }}</h5>
+              <small class="opacity-75">Est. Savings</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const labels = {{ chart_dates | tojson }};
+const prepared = {{ chart_prepared | tojson }};
+const consumed = {{ chart_consumed | tojson }};
+const surplus = {{ chart_surplus | tojson }};
+
+// Chart 1: Prepared vs Consumed
+new Chart(document.getElementById('prepConsumedChart'), {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [
+      { label: 'Prepared', data: prepared, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', fill: true, tension: 0.4 },
+      { label: 'Consumed', data: consumed, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.08)', fill: true, tension: 0.4 },
+    ]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: false } } }
+});
+
+// Chart 2: Surplus bar
+new Chart(document.getElementById('surplusChart'), {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [{ label: 'Surplus', data: surplus, backgroundColor: 'rgba(251,146,60,0.7)', borderRadius: 4 }]
+  },
+  options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}Food History — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-0"><i class="fas fa-history text-success me-2"></i>Food History</h4>
+      <p class="text-muted small mb-0">{{ org.organization_name }}</p>
+    </div>
+    <a href="{{ url_for('provider.add_history') }}" class="btn btn-success">
+      <i class="fas fa-plus me-1"></i>Add Record
+    </a>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-3">
+      <form method="GET" class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label small">Meal Type</label>
+          <select name="meal_type" class="form-select form-select-sm">
+            <option value="">All Meals</option>
+            <option value="breakfast" {% if meal_filter=='breakfast' %}selected{% endif %}>Breakfast</option>
+            <option value="lunch" {% if meal_filter=='lunch' %}selected{% endif %}>Lunch</option>
+            <option value="dinner" {% if meal_filter=='dinner' %}selected{% endif %}>Dinner</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">From</label>
+          <input type="date" name="date_from" class="form-control form-control-sm" value="{{ date_from }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">To</label>
+          <input type="date" name="date_to" class="form-control form-control-sm" value="{{ date_to }}">
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-outline-success btn-sm flex-grow-1">Filter</button>
+          <a href="{{ url_for('provider.history') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if records.items %}
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th><th>Meal</th><th>People</th>
+            <th>Prepared</th><th>Consumed</th>
+            <th>Surplus</th><th>Waste%</th>
+            <th>Event</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for h in records.items %}
+          <tr>
+            <td>{{ h.date.strftime('%d %b %Y') }}</td>
+            <td><span class="badge bg-light text-dark">{{ h.meal_type | title }}</span></td>
+            <td>{{ h.number_of_people }}</td>
+            <td>{{ h.food_prepared | int }}</td>
+            <td>{{ h.food_consumed | int }}</td>
+            <td class="{{ 'text-danger fw-semibold' if h.surplus_food > 50 else '' }}">
+              {{ h.surplus_food | int }}
+            </td>
+            <td>
+              <span class="badge {{ 'bg-danger' if h.waste_percentage > 20 else 'bg-warning text-dark' if h.waste_percentage > 10 else 'bg-success' }}">
+                {{ h.waste_percentage }}%
+              </span>
+            </td>
+            <td><span class="badge bg-light text-secondary">{{ h.event_type | replace('_',' ') | title }}</span></td>
+            <td>
+              <a href="{{ url_for('provider.edit_history', record_id=h.id) }}" class="btn btn-sm btn-outline-secondary me-1">
+                <i class="fas fa-edit"></i>
+              </a>
+              <form method="POST" action="{{ url_for('provider.delete_history', record_id=h.id) }}"
+                    class="d-inline" onsubmit="return confirm('Delete this record?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  {% if records.pages > 1 %}
+  <nav class="mt-3">
+    <ul class="pagination pagination-sm justify-content-center">
+      {% if records.has_prev %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('provider.history', page=records.prev_num, meal_type=meal_filter, date_from=date_from, date_to=date_to) }}">Previous</a>
+      </li>
+      {% endif %}
+      {% for p in records.iter_pages() %}
+        {% if p %}
+        <li class="page-item {% if p == records.page %}active{% endif %}">
+          <a class="page-link" href="{{ url_for('provider.history', page=p, meal_type=meal_filter, date_from=date_from, date_to=date_to) }}">{{ p }}</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+        {% endif %}
+      {% endfor %}
+      {% if records.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('provider.history', page=records.next_num, meal_type=meal_filter, date_from=date_from, date_to=date_to) }}">Next</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
+  {% else %}
+  <div class="text-center py-5">
+    <i class="fas fa-database fa-3x text-muted mb-3 d-block opacity-25"></i>
+    <h5 class="text-muted">No records found</h5>
+    <p class="text-muted small">Start by adding your first food history record.</p>
+    <a href="{{ url_for('provider.add_history') }}" class="btn btn-success">
+      <i class="fas fa-plus me-1"></i>Add First Record
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

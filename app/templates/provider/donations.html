@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Donations — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-4"><i class="fas fa-hands-helping text-success me-2"></i>Donation Requests</h4>
+
+  {% if requests %}
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Food</th><th>NGO</th><th>Requested</th>
+            <th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in requests %}
+          <tr>
+            <td>
+              <strong>{{ r.surplus_listing.food_name if r.surplus_listing else '—' }}</strong>
+              <br><small class="text-muted">{{ (r.surplus_listing.quantity | int if r.surplus_listing else 0) }} {{ (r.surplus_listing.unit if r.surplus_listing else '') }}</small>
+            </td>
+            <td>{{ r.ngo.organization_name if r.ngo else '—' }}</td>
+            <td class="text-muted small">{{ r.request_time.strftime('%d %b %H:%M') }}</td>
+            <td>
+              <span class="badge status-{{ r.request_status }}">{{ r.status_label() }}</span>
+            </td>
+            <td>
+              {% if r.request_status == 'pending' %}
+              <form method="POST" action="{{ url_for('provider.approve_donation', req_id=r.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-success btn-sm">
+                  <i class="fas fa-check me-1"></i>Approve
+                </button>
+              </form>
+              {% elif r.request_status == 'approved' %}
+              <form method="POST" action="{{ url_for('provider.complete_donation', req_id=r.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-outline-success btn-sm"
+                        onclick="return confirm('Mark as collected and complete this donation?')">
+                  <i class="fas fa-truck me-1"></i>Mark Collected
+                </button>
+              </form>
+              {% else %}
+              <span class="text-muted small">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="fas fa-inbox fa-3x mb-3 d-block opacity-25"></i>
+    <h5>No donation requests yet</h5>
+    <p class="small">Create a surplus listing and NGOs will be able to request it.</p>
+    <a href="{{ url_for('provider.create_surplus') }}" class="btn btn-success">Create Surplus Listing</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

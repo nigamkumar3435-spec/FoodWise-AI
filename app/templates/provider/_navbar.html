@@ -1,0 +1,33 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold text-success" href="{{ url_for('provider.dashboard') }}">
+      <i class="fas fa-leaf me-1"></i>FoodWise AI
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#provNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="provNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link {% if request.endpoint=='provider.dashboard' %}active fw-semibold{% endif %}" href="{{ url_for('provider.dashboard') }}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint=='provider.predict' %}active fw-semibold{% endif %}" href="{{ url_for('provider.predict') }}"><i class="fas fa-brain me-1"></i>Predict</a></li>
+        <li class="nav-item"><a class="nav-link {% if 'history' in request.endpoint %}active fw-semibold{% endif %}" href="{{ url_for('provider.history') }}"><i class="fas fa-history me-1"></i>History</a></li>
+        <li class="nav-item"><a class="nav-link {% if 'surplus' in request.endpoint %}active fw-semibold{% endif %}" href="{{ url_for('provider.surplus') }}"><i class="fas fa-box-open me-1"></i>Surplus</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint=='provider.donations' %}active fw-semibold{% endif %}" href="{{ url_for('provider.donations') }}"><i class="fas fa-hands-helping me-1"></i>Donations</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint=='provider.analytics' %}active fw-semibold{% endif %}" href="{{ url_for('provider.analytics') }}"><i class="fas fa-chart-bar me-1"></i>Analytics</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint=='provider.assistant' %}active fw-semibold{% endif %}" href="{{ url_for('provider.assistant') }}"><i class="fas fa-robot me-1"></i>AI Assistant</a></li>
+      </ul>
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            <i class="fas fa-user-circle me-1"></i>{{ current_user.full_name.split()[0] }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{{ url_for('provider.profile') }}"><i class="fas fa-cog me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

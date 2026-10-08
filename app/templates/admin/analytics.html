@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Analytics — Admin — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-4"><i class="fas fa-chart-line text-danger me-2"></i>Platform Analytics (Last 30 Days)</h4>
+  <div class="row g-3 mb-4">
+    {% for title, val, color in [
+      ('Total Prepared', total_prepared | int, 'primary'),
+      ('Total Consumed', total_consumed | int, 'success'),
+      ('Total Surplus', total_surplus | int, 'warning'),
+      ('Platform Waste Rate', waste_pct | string + '%', 'danger'),
+    ] %}
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <h4 class="fw-bold text-{{ color }} mb-0">{{ val }}</h4>
+        <small class="text-muted">{{ title }}</small>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <h6 class="fw-semibold mb-3">Organizations</h6>
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead class="table-light"><tr><th>Organization</th><th>Type</th><th>City</th><th>Role</th></tr></thead>
+          <tbody>
+            {% for o in orgs %}
+            <tr>
+              <td>{{ o.organization_name }}</td>
+              <td>{{ o.organization_type | title }}</td>
+              <td>{{ o.city or '—' }}</td>
+              <td><span class="badge {{ 'bg-primary' if o.user and o.user.role=='provider' else 'bg-success' }}">{{ o.user.role | title if o.user else '—' }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

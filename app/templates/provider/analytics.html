@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Analytics — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container-fluid px-4 py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="fas fa-chart-bar text-success me-2"></i>Analytics</h4>
+    <div class="btn-group btn-group-sm">
+      {% for p, label in [('7','7 Days'),('30','30 Days'),('90','90 Days')] %}
+      <a href="?period={{ p }}" class="btn {{ 'btn-success' if period == p else 'btn-outline-secondary' }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- KPI row -->
+  <div class="row g-3 mb-4">
+    {% for title, val, icon, color in [
+        ('Total Prepared', total_prepared | int, 'fas fa-utensils', 'primary'),
+        ('Total Consumed', total_consumed | int, 'fas fa-check-circle', 'success'),
+        ('Total Surplus', total_surplus | int, 'fas fa-exclamation-circle', 'warning'),
+        ('Waste Rate', waste_pct | string + '%', 'fas fa-chart-pie', 'danger' if waste_pct > 20 else 'warning' if waste_pct > 10 else 'success'),
+    ] %}
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <div class="kpi-icon bg-{{ color }}-subtle text-{{ color }} rounded-circle me-2">
+              <i class="{{ icon }}"></i>
+            </div>
+            <span class="text-muted small">{{ title }}</span>
+          </div>
+          <h4 class="fw-bold mb-0">{{ val }}</h4>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Charts -->
+  <div class="row g-3 mb-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-3">Food Prepared vs Consumed</h6>
+          <canvas id="mainChart" height="90"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-3">Surplus by Meal Type</h6>
+          <canvas id="mealChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meal type breakdown table -->
+  {% if meal_data %}
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h6 class="fw-semibold mb-3">Meal-Type Breakdown</h6>
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead class="table-light">
+            <tr><th>Meal</th><th>Prepared</th><th>Consumed</th><th>Surplus</th><th>Sessions</th><th>Avg Waste%</th></tr>
+          </thead>
+          <tbody>
+            {% for meal, data in meal_data.items() %}
+            <tr>
+              <td><span class="badge bg-light text-dark">{{ meal | title }}</span></td>
+              <td>{{ data.prepared | int }}</td>
+              <td>{{ data.consumed | int }}</td>
+              <td class="{{ 'text-danger' if data.surplus > 100 else 'text-warning' if data.surplus > 50 else 'text-success' }}">
+                {{ data.surplus | int }}
+              </td>
+              <td>{{ data.count }}</td>
+              <td>{{ (data.surplus / data.prepared * 100) | round(1) if data.prepared else 0 }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if impact %}
+  <div class="card border-0 shadow-sm bg-success text-white">
+    <div class="card-body">
+      <h6 class="fw-semibold mb-3"><i class="fas fa-star me-1"></i>Cumulative Impact</h6>
+      <div class="row g-3 text-center">
+        <div class="col-6 col-md-3"><h4 class="fw-bold mb-0">{{ impact.meals_saved }}</h4><small class="opacity-75">Meals Redistributed</small></div>
+        <div class="col-6 col-md-3"><h4 class="fw-bold mb-0">{{ impact.total_food_saved_kg | round(1) }} kg</h4><small class="opacity-75">Food Saved</small></div>
+        <div class="col-6 col-md-3"><h4 class="fw-bold mb-0">{{ impact.successful_donations }}</h4><small class="opacity-75">Donations</small></div>
+        <div class="col-6 col-md-3"><h4 class="fw-bold mb-0">₹{{ impact.money_saved | int }}</h4><small class="opacity-75">Est. Savings</small></div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const labels = {{ chart_dates | tojson }};
+new Chart(document.getElementById('mainChart'), {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [
+      { label: 'Prepared', data: {{ chart_prepared | tojson }}, borderColor: '#3b82f6', tension: 0.4, fill: false },
+      { label: 'Consumed', data: {{ chart_consumed | tojson }}, borderColor: '#22c55e', tension: 0.4, fill: false },
+      { label: 'Surplus', data: {{ chart_surplus | tojson }}, borderColor: '#f97316', tension: 0.4, fill: false, borderDash: [4,3] },
+    ]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'top' } } }
+});
+
+const mealLabels = {{ meal_data.keys() | list | tojson }};
+const mealSurplus = {{ meal_data.values() | map(attribute='surplus') | list | tojson }};
+new Chart(document.getElementById('mealChart'), {
+  type: 'doughnut',
+  data: {
+    labels: mealLabels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+    datasets: [{ data: mealSurplus, backgroundColor: ['#f97316','#3b82f6','#8b5cf6'] }]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+{% endblock %}

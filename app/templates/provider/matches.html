@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}NGO Matches — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-1"><i class="fas fa-handshake text-success me-2"></i>Recommended NGOs</h4>
+  <p class="text-muted small mb-4">
+    Surplus: <strong>{{ listing.food_name }}</strong> — {{ listing.quantity | int }} {{ listing.unit }}
+  </p>
+
+  {% if matches %}
+  <div class="row g-3">
+    {% for m in matches %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm h-100 {% if loop.index == 1 %}border-success border-2{% endif %}">
+        {% if loop.index == 1 %}
+        <div class="card-header bg-success text-white py-1 text-center small fw-semibold border-0">
+          <i class="fas fa-star me-1"></i>Best Match
+        </div>
+        {% endif %}
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="fw-semibold mb-0">{{ m.ngo_name }}</h6>
+            <span class="badge bg-success fs-6">{{ m.match_score }}%</span>
+          </div>
+          <p class="text-muted small mb-1">
+            <i class="fas fa-map-marker-alt me-1"></i>{{ m.city or 'Unknown' }}
+            {% if m.distance_km is not none %}
+            &mdash; {{ m.distance_km }} km away
+            {% endif %}
+          </p>
+          <p class="text-muted small mb-2">
+            <i class="fas fa-utensils me-1"></i>
+            Capacity: {{ m.capacity | int }} meals/day
+          </p>
+          {% if m.accepted_categories %}
+          <p class="text-muted small mb-2">
+            <i class="fas fa-check me-1"></i>
+            {{ m.accepted_categories | join(', ') | title }}
+          </p>
+          {% endif %}
+          <!-- Score breakdown -->
+          <div class="small">
+            <div class="d-flex justify-content-between text-muted"><span>Distance</span><span>{{ m.distance_score }}%</span></div>
+            <div class="progress mb-1" style="height:4px"><div class="progress-bar bg-success" style="width:{{ m.distance_score }}%"></div></div>
+            <div class="d-flex justify-content-between text-muted"><span>Capacity</span><span>{{ m.capacity_score }}%</span></div>
+            <div class="progress mb-1" style="height:4px"><div class="progress-bar bg-info" style="width:{{ m.capacity_score }}%"></div></div>
+            <div class="d-flex justify-content-between text-muted"><span>Compatibility</span><span>{{ m.compatibility_score }}%</span></div>
+            <div class="progress" style="height:4px"><div class="progress-bar bg-warning" style="width:{{ m.compatibility_score }}%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-info">
+    No NGOs found. Make sure NGOs have registered and completed their profiles.
+  </div>
+  {% endif %}
+
+  <div class="mt-4">
+    <a href="{{ url_for('provider.surplus') }}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-1"></i>Back to Surplus
+    </a>
+  </div>
+</div>
+{% endblock %}

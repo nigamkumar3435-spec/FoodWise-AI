@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}My Requests — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-4"><i class="fas fa-inbox text-success me-2"></i>My Food Requests</h4>
+
+  {% if requests %}
+  <div class="row g-3">
+    {% for r in requests %}
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <h6 class="fw-semibold mb-0">{{ r.surplus_listing.food_name if r.surplus_listing else '—' }}</h6>
+            <span class="badge status-{{ r.request_status }}">{{ r.status_label() }}</span>
+          </div>
+          {% if r.surplus_listing %}
+          <p class="text-muted small mb-1">
+            <i class="fas fa-weight-hanging me-1"></i>
+            {{ r.surplus_listing.quantity | int }} {{ r.surplus_listing.unit }}
+          </p>
+          {% if r.surplus_listing.provider %}
+          <p class="text-muted small mb-1">
+            <i class="fas fa-building me-1"></i>{{ r.surplus_listing.provider.organization_name }}
+          </p>
+          {% endif %}
+          {% endif %}
+          <!-- Status timeline -->
+          <div class="timeline mt-3 small">
+            {% set steps = [('pending','Requested'),('approved','Approved'),('completed','Collected')] %}
+            {% for status, label in steps %}
+            <div class="timeline-step {{ 'done' if r.request_status in (['pending','approved','completed'] if status == 'pending' else ['approved','completed'] if status == 'approved' else ['completed']) }}">
+              <span class="timeline-dot"></span>
+              <span class="ms-2">{{ label }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="card-footer bg-white border-0 text-muted small">
+          Requested: {{ r.request_time.strftime('%d %b %Y, %H:%M') }}
+          {% if r.approved_time %} &bull; Approved: {{ r.approved_time.strftime('%d %b %H:%M') }}{% endif %}
+          {% if r.collected_time %} &bull; Collected: {{ r.collected_time.strftime('%d %b %H:%M') }}{% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="fas fa-inbox fa-3x mb-3 d-block opacity-25"></i>
+    <h5>No requests yet</h5>
+    <a href="{{ url_for('ngo.available_food') }}" class="btn btn-success">Browse Available Food</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Donation History — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-2"><i class="fas fa-history text-success me-2"></i>Donation History</h4>
+  <p class="text-muted small mb-4">Total meals received: <strong>{{ total_meals | int }}</strong></p>
+
+  {% if completed %}
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr><th>Food</th><th>Quantity</th><th>From</th><th>Requested</th><th>Collected</th></tr>
+        </thead>
+        <tbody>
+          {% for r in completed %}
+          <tr>
+            <td><strong>{{ r.surplus_listing.food_name if r.surplus_listing else '—' }}</strong></td>
+            <td>{{ (r.surplus_listing.quantity | int if r.surplus_listing else 0) }} {{ (r.surplus_listing.unit if r.surplus_listing else '') }}</td>
+            <td>{{ r.surplus_listing.provider.organization_name if r.surplus_listing and r.surplus_listing.provider else '—' }}</td>
+            <td class="text-muted small">{{ r.request_time.strftime('%d %b %Y') }}</td>
+            <td class="text-muted small">{{ r.collected_time.strftime('%d %b %Y') if r.collected_time else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="fas fa-history fa-3x mb-3 d-block opacity-25"></i>
+    <h5>No completed donations yet</h5>
+    <a href="{{ url_for('ngo.available_food') }}" class="btn btn-success">Browse Available Food</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

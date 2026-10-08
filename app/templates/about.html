@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}About — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <h2 class="fw-bold mb-3">About FoodWise AI</h2>
+      <p class="lead text-muted mb-4">
+        AI-powered food demand forecasting and surplus redistribution platform built to
+        support SDG 2 (Zero Hunger) and SDG 12 (Responsible Consumption and Production).
+      </p>
+      <hr>
+      <h5 class="fw-semibold mt-4">Our Mission</h5>
+      <p>
+        FoodWise helps food-serving organizations — restaurants, college canteens, hotels,
+        hostels, and catering services — reduce preventable food waste through intelligent
+        demand prediction and connect surplus food with nearby NGOs and food banks.
+      </p>
+      <h5 class="fw-semibold mt-4">Technology</h5>
+      <p>Built with Python/Flask, SQLite, scikit-learn ML models, Bootstrap 5, and Chart.js.</p>
+      <a href="{{ url_for('auth.register') }}" class="btn btn-success mt-3">Get Started</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

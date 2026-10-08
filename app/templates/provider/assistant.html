@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}AI Assistant — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="mb-4">
+        <h4 class="fw-bold mb-0"><i class="fas fa-robot text-success me-2"></i>FoodWise Assistant</h4>
+        <p class="text-muted small mb-0">AI-powered insights from your real food data.</p>
+      </div>
+
+      <!-- Chat window -->
+      <div class="card border-0 shadow-sm" style="min-height:420px">
+        <div class="card-body p-0 d-flex flex-column" style="min-height:420px">
+          <div id="chatMessages" class="flex-grow-1 p-4 overflow-auto" style="max-height:500px">
+            <!-- Welcome message -->
+            <div class="chat-msg assistant mb-3">
+              <div class="chat-bubble assistant-bubble">
+                <p class="mb-1 fw-semibold"><i class="fas fa-robot me-1 text-success"></i>FoodWise Assistant</p>
+                <p class="mb-0">
+                  Hello! I'm your AI Food Management Assistant. I can answer questions about
+                  your food data, waste patterns, and savings. Try asking me:
+                </p>
+                <div class="mt-2 d-flex flex-wrap gap-1">
+                  {% for q in [
+                    'How much food should I prepare tomorrow?',
+                    'Why did food waste increase this week?',
+                    'Give me this week\'s summary.',
+                    'Which day has the highest food waste?',
+                    'How can I reduce food waste?',
+                  ] %}
+                  <button class="btn btn-sm btn-outline-success suggestion-btn"
+                          onclick="askQuestion(this.textContent)">{{ q }}</button>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input area -->
+          <div class="border-top p-3">
+            <div class="input-group">
+              <input type="text" id="chatInput" class="form-control border-success"
+                     placeholder="Ask about your food data..."
+                     onkeydown="if(event.key==='Enter'){sendMessage();}">
+              <button class="btn btn-success" onclick="sendMessage()" id="sendBtn">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+            <p class="text-muted x-small mt-1 mb-0">
+              <i class="fas fa-info-circle me-1"></i>
+              Answers are derived from your actual food history and platform data.
+              No external data is used.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function askQuestion(q) {
+  document.getElementById('chatInput').value = q;
+  sendMessage();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const question = input.value.trim();
+  if (!question) return;
+
+  input.value = '';
+  appendMessage('user', question);
+
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.disabled = true;
+  sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+  try {
+    const resp = await fetch('{{ url_for("provider.assistant_chat") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token() }}',
+      },
+      body: JSON.stringify({ question }),
+    });
+    const data = await resp.json();
+    appendMessage('assistant', data.answer || 'Sorry, I could not generate an answer.');
+  } catch (e) {
+    appendMessage('assistant', 'An error occurred. Please try again.');
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+  }
+}
+
+function appendMessage(role, text) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role} mb-3`;
+
+  const label = role === 'user'
+    ? '<p class="mb-1 fw-semibold text-primary"><i class="fas fa-user me-1"></i>You</p>'
+    : '<p class="mb-1 fw-semibold"><i class="fas fa-robot me-1 text-success"></i>FoodWise Assistant</p>';
+
+  // Convert markdown bold **text** to <strong>
+  const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\n/g, '<br>');
+
+  div.innerHTML = `<div class="chat-bubble ${role}-bubble">${label}<p class="mb-0">${formatted}</p></div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+</script>
+{% endblock %}

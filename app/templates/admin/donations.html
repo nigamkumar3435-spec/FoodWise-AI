@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Donations — Admin — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-4"><i class="fas fa-hands-helping text-danger me-2"></i>All Donation Requests</h4>
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr><th>Food</th><th>Provider</th><th>NGO</th><th>Status</th><th>Requested</th><th>Completed</th></tr>
+        </thead>
+        <tbody>
+          {% for r in requests %}
+          <tr>
+            <td>{{ r.surplus_listing.food_name if r.surplus_listing else '—' }}</td>
+            <td>{{ r.surplus_listing.provider.organization_name if r.surplus_listing and r.surplus_listing.provider else '—' }}</td>
+            <td>{{ r.ngo.organization_name if r.ngo else '—' }}</td>
+            <td><span class="badge status-{{ r.request_status }}">{{ r.status_label() }}</span></td>
+            <td class="text-muted small">{{ r.request_time.strftime('%d %b %Y') }}</td>
+            <td class="text-muted small">{{ r.collected_time.strftime('%d %b %Y') if r.collected_time else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

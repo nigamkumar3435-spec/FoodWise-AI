@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Create Surplus Listing — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <h4 class="fw-bold mb-1"><i class="fas fa-plus-circle text-success me-2"></i>Create Surplus Listing</h4>
+      <p class="text-muted small mb-4">List your surplus food for redistribution to NGOs and food banks.</p>
+
+      <div class="alert alert-warning border-warning small mb-4">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Food Safety Notice:</strong> Only food that is safe, properly stored, and suitable
+        for redistribution should be listed. Food safety remains the responsibility of the provider.
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <form method="POST" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label fw-semibold">Food Name / Description <span class="text-danger">*</span></label>
+                <input type="text" name="food_name" class="form-control" placeholder="e.g. Rice + Dal + Vegetables" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Food Category</label>
+                <select name="food_category" class="form-select">
+                  {% for cat in ['rice','dal','bread','vegetables','protein','dessert','beverages','mixed','other'] %}
+                  <option value="{{ cat }}">{{ cat | title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Quantity <span class="text-danger">*</span></label>
+                <input type="number" name="quantity" class="form-control" min="1" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Unit</label>
+                <select name="unit" class="form-select">
+                  <option value="meals">Meals/Portions</option>
+                  <option value="kg">Kilograms</option>
+                  <option value="litres">Litres</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Preparation Time</label>
+                <input type="datetime-local" name="preparation_time" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Expiry / Best-Before</label>
+                <input type="datetime-local" name="expiry_time" class="form-control">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Pickup Deadline <span class="text-danger">*</span></label>
+                <input type="datetime-local" name="pickup_deadline" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Latitude</label>
+                <input type="number" name="latitude" class="form-control" step="0.0001"
+                       value="{{ org.latitude or '' }}" placeholder="{{ org.latitude or 'e.g. 12.9716' }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Longitude</label>
+                <input type="number" name="longitude" class="form-control" step="0.0001"
+                       value="{{ org.longitude or '' }}" placeholder="{{ org.longitude or 'e.g. 77.5946' }}">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Additional Notes</label>
+                <textarea name="notes" class="form-control" rows="2"
+                          placeholder="e.g. Vegetarian, nut-free, stored at room temperature..."></textarea>
+              </div>
+            </div>
+
+            <!-- Safety confirmation -->
+            <div class="card bg-light border-0 mt-4 p-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="food_safety_confirmed"
+                       id="safetyCheck" required>
+                <label class="form-check-label fw-semibold small" for="safetyCheck">
+                  I confirm that this food has been stored appropriately and is suitable for
+                  redistribution according to applicable food-safety requirements. I understand
+                  that FoodWise AI does not guarantee food safety.
+                </label>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+              <button type="submit" class="btn btn-success fw-semibold px-4">
+                <i class="fas fa-check me-2"></i>Create Listing &amp; Find NGOs
+              </button>
+              <a href="{{ url_for('provider.surplus') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

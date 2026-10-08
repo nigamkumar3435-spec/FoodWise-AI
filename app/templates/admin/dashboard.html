@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — FoodWise AI{% endblock %}
+{% block content %}
+<div class="container-fluid px-4 py-4">
+  <h4 class="fw-bold mb-4"><i class="fas fa-shield-alt text-danger me-2"></i>Admin Dashboard</h4>
+
+  <!-- KPIs -->
+  <div class="row g-3 mb-4">
+    {% for title, val, icon, color in [
+        ('Food Providers', total_providers, 'fas fa-store', 'primary'),
+        ('NGOs / Receivers', total_ngos, 'fas fa-hands-helping', 'success'),
+        ('Surplus Listings', total_listings, 'fas fa-list', 'warning'),
+        ('Completed Donations', total_donations, 'fas fa-check-circle', 'info'),
+        ('Food Saved (kg)', total_food_saved, 'fas fa-leaf', 'success'),
+        ('Meals Saved', total_meals_saved, 'fas fa-utensils', 'primary'),
+    ] %}
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <i class="{{ icon }} text-{{ color }} fa-lg mb-2"></i>
+        <h4 class="fw-bold mb-0">{{ val }}</h4>
+        <small class="text-muted">{{ title }}</small>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="row g-3">
+    <!-- Recent Users -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+          <h6 class="fw-semibold mb-0">Recent Users</h6>
+          <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline-secondary">View All</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light"><tr><th>Name</th><th>Role</th><th>Joined</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for u in recent_users %}
+              <tr>
+                <td>{{ u.full_name }}<br><small class="text-muted">{{ u.email }}</small></td>
+                <td><span class="badge {{ 'bg-primary' if u.role=='provider' else 'bg-success' if u.role=='ngo' else 'bg-danger' }}">{{ u.role | title }}</span></td>
+                <td class="text-muted small">{{ u.created_at.strftime('%d %b') }}</td>
+                <td>
+                  <span class="badge {{ 'bg-success' if u.is_active else 'bg-secondary' }}">
+                    {{ 'Active' if u.is_active else 'Inactive' }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Listings -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+          <h6 class="fw-semibold mb-0">Recent Surplus Listings</h6>
+          <a href="{{ url_for('admin.listings') }}" class="btn btn-sm btn-outline-secondary">View All</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light"><tr><th>Food</th><th>Qty</th><th>Status</th><th>Listed</th></tr></thead>
+            <tbody>
+              {% for l in recent_listings %}
+              <tr>
+                <td>{{ l.food_name }}</td>
+                <td>{{ l.quantity | int }} {{ l.unit }}</td>
+                <td><span class="badge status-{{ l.status }}">{{ l.status | title }}</span></td>
+                <td class="text-muted small">{{ l.created_at.strftime('%d %b') }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

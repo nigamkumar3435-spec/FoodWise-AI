@@ -1,0 +1,22 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold text-success" href="{{ url_for('admin.dashboard') }}">
+      <i class="fas fa-leaf me-1"></i>FoodWise AI <span class="badge bg-danger ms-1 small">Admin</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="adminNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.dashboard') }}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.users') }}"><i class="fas fa-users me-1"></i>Users</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.listings') }}"><i class="fas fa-list me-1"></i>Listings</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.donations') }}"><i class="fas fa-hands-helping me-1"></i>Donations</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.analytics') }}"><i class="fas fa-chart-line me-1"></i>Analytics</a></li>
+      </ul>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-1"></i>Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,16 @@
+.env
+*.db
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+ml/models/best_model.pkl
+ml/models/model_meta.json
+ml/models/feature_importance.csv
+data/raw/sample_food_data.csv
+data/processed/
+instance/
